@@ -1,0 +1,129 @@
+using namespace std; //Pues para mandar mensajes a pantala
+#define NP 4000
+#define AGE 200
+int anio = 0, dia = 0, luna = 0;
+int angulo_z = 10;
+int anioTierra = 0;
+int poruno = 0;
+int pordos = 0;
+float pormedio = 0;
+int portres;
+void init(void) {
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glShadeModel(GL_FLAT);
+}
+
+void CreaPlaneta(float tamano, float tamano2, float r, float g, float b, float x, float y, float z, float lunas,
+	int velocidad, int anillo = 0, float ra = 0.7, float ga = 0.7, float ba = 0.7, float inner = 0, float outer = 0,
+	float diagonal1 = 0.0, float diagonal2 = 1.0, float moonTranslate = 0.05) {
+	glPushMatrix();
+	glRotatef((GLfloat)velocidad, (GLfloat)diagonal1, (GLfloat)diagonal2, 0.0);
+	glTranslatef(x, y, z);
+	glPushMatrix();
+
+	glRotatef((GLfloat)dia, 0.0, 1.0, 0.0); //angulo del planeta segun el dia
+	glColor3f(r, g, b); // color del planeta
+	glutWireSphere(tamano, 20, 20); /* Dibuja el primer planeta */
+
+	if (lunas == 1) {
+		glRotatef(25, 0.0, 0.0, 1.0); //Angulo constante de la luna respecto al primer planeta
+		glRotatef((GLfloat)luna, 0.0, 1.0, 0.0); //Angulo de la luna segun la hora
+		glTranslatef(moonTranslate, 0.0, 0.0); //Distancia de la luna respecto al primer planeta
+		glColor3f(ra, ga, ba);
+		glutWireSphere(tamano2, 10, 8);
+	} // dibuja la luna del primer planeta
+	glPopMatrix();
+	if (anillo == 1) {
+		glPushMatrix();
+		// glColor3f(0.25,0.41,0.85);
+		glColor3f(ra, ga, ba);
+		glRotatef(60, 1, 0, 0);
+		glutWireTorus(inner, outer, 9.0, 32.0);
+		glPopMatrix();
+
+	}
+	glPopMatrix();
+}
+
+void Sol() {
+	glColor3f(1.0, 1.0, 1.0);
+	glColor3f(1.0, 1.0, 0.0);// color del sol
+
+	glPushMatrix();
+	glutWireSphere(0.7, 20, 16);/* Dibuja el Sol */
+	glRotatef((GLfloat)poruno, 0.0, 0.0, 1.0); //angulo constante de inclinacion en z
+	glRotatef((GLfloat)poruno, 0.0, 1.0, 0.0); //angulo segun el numero de años
+	glTranslatef(1.5, 0.0, 0.0); //Distancia entre el sol y el primer planeta
+	glPopMatrix();
+}
+void display(void) {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearDepth(1.0);
+	//—————————-SOL—————————————-
+	Sol();
+	//————————-MERCURIO—————————————–
+	CreaPlaneta(0.05, 0.02, 0.6, 0.2, 0.2, -0.5, 1.0, 0.0, 1, pordos);
+	//—————————— VENUS—————————————
+	CreaPlaneta(0.05, 0.02, 0.88, 0.07, 0.23, 0.7, -1.0, 0.0, 1, pordos);
+	//_————————–TIERRA—————————————–
+	CreaPlaneta(0.15, 0.05, 0.0, 0.0, 1.0, 1.5, 0.0, 0.0, 1, poruno);
+	//—————————————————-MARTE——————–
+	CreaPlaneta(0.2, 0.0, 0.88, 0.07, 0.23, 2.0, 2.0, 0.0, 0, -poruno);
+	//—————————— JUPITER——————————
+	CreaPlaneta(0.75, 0.25, 0.82, 0.41, 0.12, 3.3, 0.0, 0.0, 1, anio, 0, 0.27, 0.5, 0.7, 3.0, 0.0, 0.0, 1.0, 1.0);
+	//—————————— SATURNO————————————-
+	CreaPlaneta(0.55, 0.25, 0.54, 0.27, 0.07, 4.0, -3.0, 0.0, 0, anio, 1, 0.0, 0.0, 0.501, 0.07, 0.72, anio, anio);
+	//—————————— URANO
+	CreaPlaneta(0.5, 0.25, 0.51, 0.8, 0.9, -4.0, -3.0, 0.0, 0, anio, 0, 0.5, 0.5, 0.5, 0.07, 0.72);
+	//—————————NEPTUNO—————————–
+	CreaPlaneta(0.4, 0.0, 0.0, 0.00, 0.501, 4.5, 3.0, 0.0, 0, -anio);
+	glutSwapBuffers();
+}
+void reshape(int w, int h) {
+	glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(60.0, (GLfloat)w / (GLfloat)h, 1.0, 20.0);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0.0, 1.0, 6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+}
+void keyInput(unsigned char key, int x, int y)
+{
+	switch (key) {
+	case 'q':
+		exit(0);
+		break;
+	case 'a':
+		poruno += 5;
+		pordos += 10;
+		pormedio += 0.5;
+		portres += 15;
+		dia = dia + 1;
+		anio = anio + 1;
+		angulo_z = angulo_z + 1;
+		dia = dia + 1;
+		luna = luna + 1;
+		glutPostRedisplay();
+		break;
+
+	case 's':
+		dia = dia + 1;
+		luna = luna + 1;
+		glutPostRedisplay();
+		break;
+	}
+}
+int main(int argc, char** argv) {
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitWindowSize(1400, 700);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow(argv[0]);
+	init();
+	glutDisplayFunc(display);
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(keyInput);
+	glutMainLoop();
+	return 0;
+}
